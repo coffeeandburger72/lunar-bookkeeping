@@ -17,9 +17,6 @@ function showScreen(name) {
   for (const tab of tabs) {
     tab.classList.toggle('active', tab.dataset.screen === name);
   }
-  if (entrySaveBar) {
-    entrySaveBar.dataset.visible = name === 'entry' ? 'true' : 'false';
-  }
   if (name === 'ledger') renderLedger();
 }
 
@@ -90,11 +87,13 @@ function buildEntryScreen() {
     sheet.dataset.open = 'true';
     backdrop.dataset.open = 'true';
     amountCard.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('sheet-open');
   }
   function closeSheet() {
     sheet.dataset.open = 'false';
     backdrop.dataset.open = 'false';
     amountCard.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('sheet-open');
   }
 
   amountCard.addEventListener('click', () => {
@@ -108,15 +107,11 @@ function buildEntryScreen() {
 
   const pad = renderNotePad(root);
 
-  const saveBar = document.createElement('div');
-  saveBar.className = 'save-bar';
   const saveBtn = document.createElement('button');
   saveBtn.type = 'button';
   saveBtn.className = 'save-btn';
   saveBtn.textContent = '入賬';
-  saveBar.appendChild(saveBtn);
-  document.body.appendChild(saveBar);
-  entrySaveBar = saveBar;
+  root.appendChild(saveBtn);
 
   const chop = document.createElement('div');
   chop.className = 'chop';
@@ -166,7 +161,6 @@ function buildEntryScreen() {
   });
 }
 
-let entrySaveBar = null;
 
 // -------- Ledger screen --------
 

@@ -1,5 +1,4 @@
-const COLUMNS = 10;
-const CENTS_COLUMNS = 2;
+const COLUMNS = 9;
 const NS = 'http://www.w3.org/2000/svg';
 
 const COL_W = 26;
@@ -22,7 +21,6 @@ const COL_LABELS = {
   6: '十',
   7: '元',
   8: '角',
-  9: '分',
 };
 
 export function renderAbacus(container, onChange) {
@@ -183,7 +181,8 @@ export function renderAbacus(container, onChange) {
     for (let c = 0; c < COLUMNS; c++) {
       total = total * 10 + columnValue(c);
     }
-    return total;
+    // Last column is 角 = 10 cents
+    return total * 10;
   }
 
   function handleBeadTap(t) {
@@ -206,11 +205,58 @@ export function renderAbacus(container, onChange) {
     onChange(totalCents());
   }
 
-  svg.addEventListener('click', e => {
+  // Drag physics: push beads toward/away from the bar like a real abacus.
+  // Tap (no movement) still toggles via handleBeadTap.
+  let drag = null;
+  const SNAP_PX = 5;
+
+  svg.addEventListener('pointerdown', e => {
     const t = e.target.closest('.bead');
     if (!t) return;
-    handleBeadTap(t);
+    drag = {
+      target: t,
+      c: Number(t.dataset.col),
+      idx: Number(t.dataset.idx),
+      kind: t.dataset.kind,
+      startY: e.clientY,
+      moved: false,
+    };
+    try { svg.setPointerCapture(e.pointerId); } catch {}
+    e.preventDefault();
   });
+
+  svg.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dy = e.clientY - drag.startY;
+    if (Math.abs(dy) < SNAP_PX) return;
+    drag.moved = true;
+    const s = state[drag.c];
+    if (drag.kind === 'heaven') {
+      // push down toward bar = activate; pull up = deactivate
+      if (dy > SNAP_PX) {
+        for (let i = drag.idx; i < 2; i++) s.heaven[i] = true;
+      } else {
+        for (let i = 0; i <= drag.idx; i++) s.heaven[i] = false;
+      }
+    } else {
+      // push up toward bar = activate; pull down = deactivate
+      if (dy < -SNAP_PX) {
+        for (let i = 0; i <= drag.idx; i++) s.earth[i] = true;
+      } else {
+        for (let i = drag.idx; i < 5; i++) s.earth[i] = false;
+      }
+    }
+    layout();
+    onChange(totalCents());
+  });
+
+  function endDrag() {
+    if (!drag) return;
+    if (!drag.moved) handleBeadTap(drag.target);
+    drag = null;
+  }
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
 
   layout();
   onChange(0);

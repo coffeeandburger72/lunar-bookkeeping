@@ -40,9 +40,11 @@ body::before {
 #app {
   max-width: 480px;
   margin: 0 auto;
-  padding: 16px 16px calc(160px + env(safe-area-inset-bottom)) 16px;
+  padding: 16px 16px calc(88px + env(safe-area-inset-bottom)) 16px;
   min-height: 100vh;
 }
+
+body.sheet-open { overflow: hidden; }
 
 .screen { display: none; }
 .screen[data-active="true"] { display: block; }
@@ -112,13 +114,17 @@ body::before {
   width: 100%;
   height: auto;
   margin: 12px 0 4px;
-  touch-action: manipulation;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .abacus .bead {
   transition: transform 140ms cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
 }
+.abacus .bead:active { cursor: grabbing; }
 
 .amount-card {
   display: block;
@@ -209,25 +215,6 @@ body::before {
   margin: 0;
 }
 
-.save-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(68px + env(safe-area-inset-bottom));
-  z-index: 3;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 8px 16px;
-  pointer-events: none;
-  transform: translateY(140%);
-  opacity: 0;
-  transition: transform 280ms cubic-bezier(0.33, 1, 0.68, 1), opacity 220ms ease;
-}
-.save-bar[data-visible="true"] {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
 
 .notepad {
   position: relative;
@@ -308,17 +295,17 @@ body::before {
 .save-btn {
   display: block;
   width: 100%;
-  margin: 0;
-  padding: 16px 0;
+  margin: 24px 0 8px;
+  padding: 18px 0;
   font-family: inherit;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 900;
   color: var(--paper);
   background: var(--seal);
   border: none;
   border-radius: 8px;
   letter-spacing: 6px;
-  min-height: 60px;
+  min-height: 64px;
   box-shadow: 0 6px 18px rgba(184, 0, 46, 0.35);
 }
 
