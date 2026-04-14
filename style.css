@@ -215,3 +215,106 @@ html, body {
   30%  { opacity: 0.5; transform: translate(-50%, -50%) rotate(-8deg) scale(1.0); }
   100% { opacity: 0;   transform: translate(-50%, -50%) rotate(-8deg) scale(1.0); }
 }
+
+.month-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 4px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cash);
+  border-bottom: 2px solid var(--rule);
+}
+
+.month-total strong {
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 0;
+}
+
+.filter-chip {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  background: transparent;
+  border: 1.5px solid var(--rule);
+  border-radius: 14px;
+  padding: 6px 12px;
+  min-height: 32px;
+}
+
+.filter-chip.active {
+  color: var(--paper);
+  background: var(--seal);
+  border-color: var(--seal);
+}
+
+.ledger-list { margin-bottom: 16px; }
+
+.ledger-row {
+  border-bottom: 1px solid var(--rule);
+}
+
+.ledger-summary {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "date amount"
+    "cat  thumb";
+  gap: 4px 12px;
+  width: 100%;
+  padding: 12px 4px;
+  font-family: inherit;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--ink);
+}
+
+.lr-date   { grid-area: date;   font-size: 16px; font-weight: 700; }
+.lr-amount { grid-area: amount; font-size: 22px; font-weight: 900;
+             font-variant-numeric: tabular-nums; }
+.lr-cat    { grid-area: cat;    font-size: 18px; color: var(--seal); font-weight: 700; }
+.lr-thumb  { grid-area: thumb;  width: 120px; height: 44px; opacity: 0.8; }
+
+.ledger-detail {
+  padding: 8px 4px 16px;
+}
+
+.lr-full {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--paper);
+  border: 1px dashed var(--rule);
+  margin-bottom: 8px;
+}
+
+.lr-delete {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--paper);
+  background: var(--seal);
+  border: none;
+  border-radius: 4px;
+  padding: 8px 20px;
+  min-height: 40px;
+}
+
+.ledger-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--ink);
+  opacity: 0.5;
+  font-size: 20px;
+  font-weight: 700;
+}

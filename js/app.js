@@ -1,8 +1,8 @@
 import { toLunarString } from './lunar.js';
-import { saveRecord } from './storage.js';
-import { renderCategoryGrid } from './categories.js';
+import { saveRecord, loadRecords, deleteRecord } from './storage.js';
+import { renderCategoryGrid, CATEGORIES } from './categories.js';
 import { renderAbacus } from './abacus.js';
-import { renderNotePad } from './handwriting.js';
+import { renderNotePad, drawStrokes } from './handwriting.js';
 
 const tabs = document.querySelectorAll('#tabs .tab');
 const screens = {
@@ -107,10 +107,101 @@ function buildEntryScreen() {
   });
 }
 
-// -------- Ledger screen (placeholder until Task 8) --------
+// -------- Ledger screen --------
+
+let activeFilter = null;
 
 function renderLedger() {
-  screens.ledger.innerHTML = '<p style="padding:24px;text-align:center;opacity:.6">賬簿 — 待開發</p>';
+  const root = screens.ledger;
+  root.innerHTML = '';
+
+  const all = loadRecords().sort((a, b) => b.createdAt - a.createdAt);
+
+  // Month total for the current calendar month
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const monthTotal = all
+    .filter(r => r.createdAt >= monthStart)
+    .reduce((sum, r) => sum + r.amount, 0);
+
+  const totalBox = document.createElement('div');
+  totalBox.className = 'month-total';
+  totalBox.innerHTML = `<span>本月總計</span><strong>$${(monthTotal / 100).toFixed(2)}</strong>`;
+  root.appendChild(totalBox);
+
+  // Filter chips
+  const chips = document.createElement('div');
+  chips.className = 'filter-chips';
+  for (const name of CATEGORIES) {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'filter-chip';
+    chip.textContent = name;
+    if (activeFilter === name) chip.classList.add('active');
+    chip.addEventListener('click', () => {
+      activeFilter = activeFilter === name ? null : name;
+      renderLedger();
+    });
+    chips.appendChild(chip);
+  }
+  root.appendChild(chips);
+
+  // List
+  const list = document.createElement('div');
+  list.className = 'ledger-list';
+  root.appendChild(list);
+
+  const visible = activeFilter ? all.filter(r => r.category === activeFilter) : all;
+
+  if (visible.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'ledger-empty';
+    empty.textContent = '空簿';
+    list.appendChild(empty);
+  } else {
+    for (const r of visible) {
+      list.appendChild(buildLedgerRow(r));
+    }
+  }
+}
+
+function buildLedgerRow(record) {
+  const row = document.createElement('div');
+  row.className = 'ledger-row';
+
+  const summary = document.createElement('button');
+  summary.type = 'button';
+  summary.className = 'ledger-summary';
+  summary.innerHTML = `
+    <div class="lr-date">${record.lunarDate}</div>
+    <div class="lr-amount">$${(record.amount / 100).toFixed(2)}</div>
+    <div class="lr-cat">${record.category}</div>
+    <canvas class="lr-thumb" width="160" height="60"></canvas>
+  `;
+  drawStrokes(summary.querySelector('.lr-thumb'), record.noteStrokes);
+  row.appendChild(summary);
+
+  const detail = document.createElement('div');
+  detail.className = 'ledger-detail';
+  detail.hidden = true;
+  detail.innerHTML = `
+    <canvas class="lr-full" width="480" height="200"></canvas>
+    <button type="button" class="lr-delete">刪除</button>
+  `;
+  drawStrokes(detail.querySelector('.lr-full'), record.noteStrokes);
+  row.appendChild(detail);
+
+  summary.addEventListener('click', () => {
+    detail.hidden = !detail.hidden;
+  });
+
+  detail.querySelector('.lr-delete').addEventListener('click', () => {
+    if (!confirm('確定?')) return;
+    deleteRecord(record.id);
+    renderLedger();
+  });
+
+  return row;
 }
 
 buildEntryScreen();
