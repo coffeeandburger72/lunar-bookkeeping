@@ -105,3 +105,37 @@ html, body {
   font-variant-numeric: tabular-nums;
   margin: 8px 0 4px;
 }
+
+.notepad {
+  position: relative;
+  margin: 24px 0;
+  border: 2px solid var(--rule);
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0, transparent 28px,
+      var(--rule) 28px, var(--rule) 29px
+    );
+}
+
+.notepad-canvas {
+  display: block;
+  width: 100%;
+  height: 180px;
+  touch-action: none;
+}
+
+.notepad-clear {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--seal);
+  background: transparent;
+  border: none;
+  min-height: 32px;
+  padding: 0 8px;
+}
