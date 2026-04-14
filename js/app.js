@@ -124,7 +124,7 @@ function buildEntryScreen() {
     <svg viewBox="0 0 100 100" aria-hidden="true">
       <rect x="4" y="4" width="92" height="92" rx="3" fill="var(--seal)" />
       <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
-            font-family="'華康新篆體','DFPHSinZhuanW7','DFPHSin Zhuan W7','HanWangZhuanShu','Long Cang','ZCOOL XiaoWei','Noto Serif TC',serif"
+            font-family="'Noto Serif TC','Ma Shan Zheng',serif"
             font-size="68" font-weight="900" fill="var(--paper)">入</text>
     </svg>
   `;
