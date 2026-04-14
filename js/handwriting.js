@@ -1,3 +1,5 @@
+const NATIVE_ASPECT = 3 / 2;
+
 export function renderNotePad(container) {
   const wrap = document.createElement('div');
   wrap.className = 'notepad';
@@ -20,7 +22,7 @@ export function renderNotePad(container) {
   const preview = document.createElement('canvas');
   preview.className = 'notepad-preview';
   preview.width = 600;
-  preview.height = 250;
+  preview.height = 400;
   openBtn.appendChild(preview);
 
   const clearBtn = document.createElement('button');
@@ -96,7 +98,7 @@ function openDrawSheet(initialStrokes, onDone) {
   const canvas = document.createElement('canvas');
   canvas.className = 'draw-sheet-canvas';
   const W = 600;
-  const H = 250;
+  const H = 400;
   canvas.width = W;
   canvas.height = H;
   sheet.appendChild(canvas);
@@ -182,16 +184,31 @@ export function drawStrokes(canvas, strokes) {
   const W = canvas.width;
   const H = canvas.height;
   ctx.clearRect(0, 0, W, H);
+
+  const dstAspect = W / H;
+  let drawW, drawH, offX, offY;
+  if (dstAspect > NATIVE_ASPECT) {
+    drawH = H;
+    drawW = H * NATIVE_ASPECT;
+    offX = (W - drawW) / 2;
+    offY = 0;
+  } else {
+    drawW = W;
+    drawH = W / NATIVE_ASPECT;
+    offX = 0;
+    offY = (H - drawH) / 2;
+  }
+
   ctx.strokeStyle = '#1a1a1a';
-  ctx.lineWidth = Math.max(1, W / 200);
+  ctx.lineWidth = Math.max(1, drawW / 200);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   for (const stroke of strokes) {
     if (stroke.length === 0) continue;
     ctx.beginPath();
-    ctx.moveTo(stroke[0][0] * W, stroke[0][1] * H);
+    ctx.moveTo(offX + stroke[0][0] * drawW, offY + stroke[0][1] * drawH);
     for (let i = 1; i < stroke.length; i++) {
-      ctx.lineTo(stroke[i][0] * W, stroke[i][1] * H);
+      ctx.lineTo(offX + stroke[i][0] * drawW, offY + stroke[i][1] * drawH);
     }
     ctx.stroke();
   }

@@ -296,7 +296,7 @@ body.sheet-open { overflow: hidden; }
   display: none;
   width: 100%;
   height: auto;
-  aspect-ratio: 12 / 5;
+  aspect-ratio: 3 / 2;
   pointer-events: none;
 }
 
@@ -379,12 +379,13 @@ body.sheet-open { overflow: hidden; }
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 12 / 5;
+  aspect-ratio: 3 / 2;
+  max-height: 70vh;
   background:
     repeating-linear-gradient(
       to bottom,
-      transparent 0, transparent 38px,
-      var(--rule) 38px, var(--rule) 39px
+      transparent 0, transparent 44px,
+      var(--rule) 44px, var(--rule) 45px
     ),
     var(--paper);
   border: 2px solid var(--rule);
