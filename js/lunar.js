@@ -66,6 +66,7 @@ function stemBranch(y) {
 
 export function toLunarString(date) {
   const base = new Date(1900, 0, 31); // 1900-01-31 == 農曆 1900 正月初一
+  if (date < base) return date.toISOString().slice(0, 10) + ' ⚠';
   let offset = Math.floor((date.getTime() - base.getTime()) / 86400000);
 
   let year = 1900;

@@ -17,6 +17,17 @@ for (const [y, m, d, expected] of cases) {
   if (!pass) failed++;
 }
 
+const fallbackCases = [
+  [1899, 12, 31],
+  [2101, 2, 1],
+];
+for (const [y, m, d] of fallbackCases) {
+  const actual = toLunarString(new Date(y, m - 1, d));
+  const pass = actual.endsWith(' ⚠');
+  console.log(`${pass ? 'PASS' : 'FAIL'} ${y}-${m}-${d} -> ${actual} (expected ends with ⚠)`);
+  if (!pass) failed++;
+}
+
 if (failed > 0) {
   console.log(`\n${failed} test(s) failed`);
   process.exit(1);
