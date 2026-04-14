@@ -8,7 +8,19 @@
   --bead: #3a2418;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, .cat-cell, .tab, .filter-chip, .lf-btn, .save-btn, .notepad-clear,
+.lr-delete, .amount-card, .ledger-summary {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button:focus, button:focus-visible { outline: none; }
 
 html, body {
   margin: 0;
