@@ -113,7 +113,8 @@ function buildEntryScreen() {
   const saveBtn = document.createElement('button');
   saveBtn.type = 'button';
   saveBtn.className = 'save-btn';
-  saveBtn.innerHTML = '<span class="save-btn-inner">入<br>賬</span>';
+  saveBtn.setAttribute('aria-label', '入賬確認');
+  saveBtn.innerHTML = '<img src="assets/save-stamp.png" alt="入賬確認" draggable="false" />';
   saveSlot.appendChild(saveBtn);
   document.body.appendChild(saveSlot);
 
