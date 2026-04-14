@@ -123,9 +123,9 @@ function buildEntryScreen() {
   chop.innerHTML = `
     <svg viewBox="0 0 100 100" aria-hidden="true">
       <rect x="4" y="4" width="92" height="92" rx="3" fill="var(--seal)" />
-      <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
+      <text x="50" y="74" text-anchor="middle"
             font-family="'Noto Serif TC','Ma Shan Zheng',serif"
-            font-size="68" font-weight="900" fill="var(--paper)">入</text>
+            font-size="72" font-weight="900" fill="var(--paper)">入</text>
     </svg>
   `;
   chop.addEventListener('animationend', () => chop.classList.remove('stamp'));
