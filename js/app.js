@@ -108,11 +108,14 @@ function buildEntryScreen() {
 
   const pad = renderNotePad(root);
 
+  const saveSlot = document.createElement('div');
+  saveSlot.className = 'save-btn-slot';
   const saveBtn = document.createElement('button');
   saveBtn.type = 'button';
   saveBtn.className = 'save-btn';
   saveBtn.innerHTML = '<span class="save-btn-inner">入<br>賬</span>';
-  document.body.appendChild(saveBtn);
+  saveSlot.appendChild(saveBtn);
+  document.body.appendChild(saveSlot);
 
   const chop = document.createElement('div');
   chop.className = 'chop';
@@ -120,8 +123,8 @@ function buildEntryScreen() {
     <svg viewBox="0 0 100 100" aria-hidden="true">
       <rect x="4" y="4" width="92" height="92" rx="3" fill="var(--seal)" />
       <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
-            font-family="'華康新篆體','DFPHSinZhuanW7','DFPHSin Zhuan W7','HanWangZhuanShu','ZCOOL XiaoWei','Noto Serif TC',serif"
-            font-size="68" font-weight="900" fill="#f6d06a">入</text>
+            font-family="'華康新篆體','DFPHSinZhuanW7','DFPHSin Zhuan W7','HanWangZhuanShu','Long Cang','ZCOOL XiaoWei','Noto Serif TC',serif"
+            font-size="68" font-weight="900" fill="var(--paper)">入</text>
     </svg>
   `;
   chop.addEventListener('animationend', () => chop.classList.remove('stamp'));
