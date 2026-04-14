@@ -1,6 +1,7 @@
 export function renderNotePad(container) {
   const wrap = document.createElement('div');
   wrap.className = 'notepad';
+  wrap.dataset.locked = 'true';
 
   const tag = document.createElement('span');
   tag.className = 'notepad-label';
@@ -11,6 +12,12 @@ export function renderNotePad(container) {
   canvas.className = 'notepad-canvas';
   wrap.appendChild(canvas);
 
+  const lockBtn = document.createElement('button');
+  lockBtn.type = 'button';
+  lockBtn.textContent = '寫';
+  lockBtn.className = 'notepad-lock';
+  wrap.appendChild(lockBtn);
+
   const clearBtn = document.createElement('button');
   clearBtn.type = 'button';
   clearBtn.textContent = '清';
@@ -18,6 +25,12 @@ export function renderNotePad(container) {
   wrap.appendChild(clearBtn);
 
   container.appendChild(wrap);
+
+  lockBtn.addEventListener('click', () => {
+    const locked = wrap.dataset.locked !== 'false';
+    wrap.dataset.locked = locked ? 'false' : 'true';
+    lockBtn.textContent = locked ? '鎖' : '寫';
+  });
 
   // Use a fixed internal resolution for crisp strokes; CSS sizes it responsively.
   const W = 480;
@@ -53,6 +66,7 @@ export function renderNotePad(container) {
   }
 
   canvas.addEventListener('pointerdown', e => {
+    if (wrap.dataset.locked !== 'false') return;
     canvas.setPointerCapture(e.pointerId);
     startT = Date.now();
     current = [pointFromEvent(e)];
@@ -62,6 +76,7 @@ export function renderNotePad(container) {
 
   canvas.addEventListener('pointermove', e => {
     if (!current) return;
+    if (wrap.dataset.locked !== 'false') return;
     const p = pointFromEvent(e);
     const prev = current[current.length - 1];
     current.push(p);

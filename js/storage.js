@@ -1,4 +1,5 @@
 const KEY = 'bookkeeping.records';
+const SETTINGS_KEY = 'bookkeeping.settings';
 
 export function loadRecords() {
   try {
@@ -28,20 +29,39 @@ export function clearAll() {
 }
 
 export function exportJSON() {
-  return JSON.stringify(loadRecords(), null, 2);
+  let settings = null;
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (raw) settings = JSON.parse(raw);
+  } catch { /* ignore */ }
+  return JSON.stringify({
+    version: 2,
+    records: loadRecords(),
+    settings,
+  }, null, 2);
 }
 
 export function importJSON(str) {
   const data = JSON.parse(str);
-  if (!Array.isArray(data)) throw new Error('唔啱格式');
-  for (const r of data) {
+  let records;
+  let settings = null;
+  if (Array.isArray(data)) {
+    records = data;
+  } else if (data && Array.isArray(data.records)) {
+    records = data.records;
+    if (data.settings && typeof data.settings === 'object') settings = data.settings;
+  } else {
+    throw new Error('唔啱格式');
+  }
+  for (const r of records) {
     if (typeof r.id !== 'string') throw new Error('唔啱格式');
     if (typeof r.amount !== 'number') throw new Error('唔啱格式');
     if (typeof r.category !== 'string') throw new Error('唔啱格式');
     if (typeof r.createdAt !== 'number') throw new Error('唔啱格式');
     if (!Array.isArray(r.noteStrokes)) throw new Error('唔啱格式');
   }
-  writeAll(data);
+  writeAll(records);
+  if (settings) localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
 export function renameCategories(renames) {

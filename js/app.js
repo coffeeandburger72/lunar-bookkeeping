@@ -48,10 +48,11 @@ function buildEntryScreen() {
     </div>
     <div class="lunar-date"></div>
     <button type="button" class="gear-btn" aria-label="設定">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9.4 4a7.5 7.5 0 0 0-.1-1.3l2.1-1.6-2-3.4-2.5 1a7.5 7.5 0 0 0-2.3-1.3l-.4-2.6h-4l-.4 2.6a7.5 7.5 0 0 0-2.3 1.3l-2.5-1-2 3.4 2.1 1.6A7.5 7.5 0 0 0 2.6 12c0 .4 0 .9.1 1.3L.6 14.9l2 3.4 2.5-1a7.5 7.5 0 0 0 2.3 1.3l.4 2.6h4l.4-2.6a7.5 7.5 0 0 0 2.3-1.3l2.5 1 2-3.4-2.1-1.6c.1-.4.1-.9.1-1.3z"
-              fill="none" stroke="var(--ink)" stroke-width="1.6"
-              stroke-linejoin="round" />
+      <svg viewBox="0 0 24 24" aria-hidden="true"
+           fill="none" stroke="var(--ink)" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
       </svg>
     </button>
   `;
@@ -390,6 +391,10 @@ function renderLedger() {
     const text = await file.text();
     try {
       importJSON(text);
+      const fresh = loadSettings();
+      if (currentCats) currentCats.updateNames(fresh.categories);
+      activeFilter = null;
+      refreshDate();
       renderLedger();
     } catch (err) {
       alert('唔啱格式: ' + err.message);
