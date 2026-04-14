@@ -89,3 +89,19 @@ html, body {
 @keyframes draw-circle {
   to { stroke-dashoffset: 0; }
 }
+
+.abacus {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 16px 0;
+  touch-action: manipulation;
+}
+
+.amount-readout {
+  font-size: 44px;
+  font-weight: 900;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 4px;
+}
