@@ -151,9 +151,17 @@ function buildEntryScreen() {
     const amount = abacus.value;
     const category = cats.value;
     if (amount === 0 || !category) {
-      saveBtn.classList.remove('shake');
-      void saveBtn.offsetWidth;
-      saveBtn.classList.add('shake');
+      saveBtn.animate(
+        [
+          { transform: 'translate3d(0,0,0)' },
+          { transform: 'translate3d(-8px,0,0)' },
+          { transform: 'translate3d(8px,0,0)' },
+          { transform: 'translate3d(-6px,0,0)' },
+          { transform: 'translate3d(6px,0,0)' },
+          { transform: 'translate3d(0,0,0)' },
+        ],
+        { duration: 300, easing: 'ease-in-out' }
+      );
       return;
     }
     const record = {

@@ -30,6 +30,7 @@ html, body {
   font-family: "Noto Serif TC", "Ma Shan Zheng", serif;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
   background-image:
     radial-gradient(ellipse at top, rgba(255,255,255,0.4), transparent 60%),
     radial-gradient(ellipse at bottom right, rgba(120, 80, 20, 0.08), transparent 60%);
@@ -53,7 +54,7 @@ body::before {
   max-width: 480px;
   margin: 0 auto;
   padding: 16px 16px calc(140px + env(safe-area-inset-bottom)) 16px;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 body.sheet-open { overflow: hidden; }
@@ -71,6 +72,8 @@ body.sheet-open { overflow: hidden; }
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom)) 16px;
   background: var(--paper);
   border-top: 2px solid var(--rule);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 #tabs .tab {
@@ -254,7 +257,7 @@ body.sheet-open { overflow: hidden; }
 .notepad-open {
   display: block;
   width: 100%;
-  min-height: 120px;
+  aspect-ratio: 3 / 2;
   padding: 0;
   border: 2px dashed var(--rule);
   border-radius: 4px;
@@ -276,11 +279,11 @@ body.sheet-open { overflow: hidden; }
 }
 
 .notepad-hint {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-height: 120px;
   font-family: inherit;
   font-size: 17px;
   letter-spacing: 4px;
@@ -295,8 +298,7 @@ body.sheet-open { overflow: hidden; }
 .notepad-preview {
   display: none;
   width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
+  height: 100%;
   pointer-events: none;
 }
 
@@ -484,17 +486,6 @@ body[data-screen="ledger"] .save-btn-slot {
   pointer-events: none;
 }
 
-.save-btn.shake {
-  animation: shake 260ms ease-in-out;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
-}
 
 .chop {
   position: fixed;
