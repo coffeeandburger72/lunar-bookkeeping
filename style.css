@@ -111,8 +111,26 @@ body::before {
   display: block;
   width: 100%;
   height: auto;
-  margin: 16px 0;
+  margin: 12px 0 4px;
   touch-action: manipulation;
+}
+
+.abacus .bead {
+  transition: transform 140ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.amount-card {
+  display: block;
+  width: 100%;
+  margin: 8px 0 4px;
+  padding: 14px 12px 10px;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  border-bottom: 2px dashed var(--rule);
+  cursor: pointer;
+  text-align: center;
 }
 
 .amount-readout {
@@ -120,7 +138,37 @@ body::before {
   font-weight: 900;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  margin: 8px 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.amount-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--seal);
+  opacity: 0.75;
+  letter-spacing: 1px;
+}
+
+.amount-card[aria-expanded="true"] .amount-hint::before {
+  content: "▲ ";
+}
+.amount-card[aria-expanded="false"] .amount-hint::before {
+  content: "▼ ";
+}
+
+.abacus-drawer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 280ms ease;
+}
+
+.abacus-drawer[data-open="true"] {
+  max-height: 360px;
 }
 
 .notepad {

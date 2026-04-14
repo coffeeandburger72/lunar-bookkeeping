@@ -37,9 +37,9 @@ function buildEntryScreen() {
       <svg viewBox="0 0 100 100">
         <rect x="4" y="4" width="92" height="92" fill="none"
               stroke="var(--seal)" stroke-width="4" />
-        <text x="50" y="58" text-anchor="middle"
+        <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
               font-family="Noto Serif TC, serif"
-              font-size="42" font-weight="900" fill="var(--seal)">數簿</text>
+              font-size="38" font-weight="900" fill="var(--seal)">數簿</text>
       </svg>
     </div>
     <div class="lunar-date"></div>
@@ -47,15 +47,37 @@ function buildEntryScreen() {
   root.appendChild(header);
   header.querySelector('.lunar-date').textContent = toLunarString(new Date());
 
-  const readout = document.createElement('div');
-  readout.className = 'amount-readout';
-  readout.textContent = '$0.00';
-  root.appendChild(readout);
+  const amountCard = document.createElement('button');
+  amountCard.type = 'button';
+  amountCard.className = 'amount-card';
+  amountCard.setAttribute('aria-expanded', 'false');
+  amountCard.innerHTML = `
+    <div class="amount-readout">$0.00</div>
+    <span class="amount-hint">按此用算盤輸入</span>
+  `;
+  root.appendChild(amountCard);
+  const readout = amountCard.querySelector('.amount-readout');
 
-  const abacusWrap = document.createElement('div');
-  root.appendChild(abacusWrap);
-  const abacus = renderAbacus(abacusWrap, cents => {
-    readout.textContent = '$' + (cents / 100).toFixed(2);
+  function setReadout(cents) {
+    const text = '$' + (cents / 100).toFixed(2);
+    readout.textContent = text;
+    const len = text.length;
+    let size = 44;
+    if (len > 8) size = 44 - (len - 8) * 3;
+    if (size < 22) size = 22;
+    readout.style.fontSize = size + 'px';
+  }
+
+  const abacusDrawer = document.createElement('div');
+  abacusDrawer.className = 'abacus-drawer';
+  abacusDrawer.dataset.open = 'false';
+  root.appendChild(abacusDrawer);
+  const abacus = renderAbacus(abacusDrawer, setReadout);
+
+  amountCard.addEventListener('click', () => {
+    const open = abacusDrawer.dataset.open === 'true';
+    abacusDrawer.dataset.open = open ? 'false' : 'true';
+    amountCard.setAttribute('aria-expanded', open ? 'false' : 'true');
   });
 
   const cats = renderCategoryGrid(root, () => {});
@@ -73,9 +95,9 @@ function buildEntryScreen() {
   chop.innerHTML = `
     <svg viewBox="0 0 100 100" aria-hidden="true">
       <rect x="4" y="4" width="92" height="92" rx="4" fill="var(--seal)" />
-      <text x="50" y="72" text-anchor="middle"
+      <text x="50" y="52" text-anchor="middle" dominant-baseline="central"
             font-family="Noto Serif TC, serif"
-            font-size="72" font-weight="900" fill="var(--paper)">入</text>
+            font-size="68" font-weight="900" fill="var(--paper)">入</text>
     </svg>
   `;
   chop.addEventListener('animationend', () => chop.classList.remove('stamp'));
@@ -112,6 +134,8 @@ function buildEntryScreen() {
     abacus.reset();
     cats.clear();
     pad.clear();
+    abacusDrawer.dataset.open = 'false';
+    amountCard.setAttribute('aria-expanded', 'false');
   });
 }
 
