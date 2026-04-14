@@ -1,21 +1,29 @@
-export const CATEGORIES = [
-  '伙食', '買餸', '車費',
-  '水電煤', '屋租', '衫褲',
-  '交際', '雜項', '煙仔',
-];
+import { loadSettings, DEFAULT_CATEGORIES } from './settings.js';
+
+export { DEFAULT_CATEGORIES as CATEGORIES };
+
+export function getCategories() {
+  return loadSettings().categories;
+}
 
 export function renderCategoryGrid(container, onChange) {
   const grid = document.createElement('div');
   grid.className = 'cat-grid';
 
   let selected = null;
-  const cells = new Map();
+  const cells = [];
 
-  for (const name of CATEGORIES) {
+  const names = getCategories();
+
+  for (let i = 0; i < names.length; i++) {
     const cell = document.createElement('button');
     cell.type = 'button';
     cell.className = 'cat-cell';
-    cell.textContent = name;
+
+    const label = document.createElement('span');
+    label.className = 'cat-label';
+    label.textContent = names[i];
+    cell.appendChild(label);
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 120 60');
@@ -31,18 +39,22 @@ export function renderCategoryGrid(container, onChange) {
     cell.appendChild(svg);
 
     cell.addEventListener('click', () => {
+      const name = label.textContent;
       if (selected === name) {
         selected = null;
-        cells.get(name).classList.remove('selected');
+        cell.classList.remove('selected');
       } else {
-        if (selected) cells.get(selected).classList.remove('selected');
+        if (selected) {
+          const prev = cells.find(c => c.label.textContent === selected);
+          if (prev) prev.cell.classList.remove('selected');
+        }
         selected = name;
         cell.classList.add('selected');
       }
       onChange(selected);
     });
 
-    cells.set(name, cell);
+    cells.push({ cell, label });
     grid.appendChild(cell);
   }
 
@@ -52,8 +64,17 @@ export function renderCategoryGrid(container, onChange) {
     get value() { return selected; },
     clear() {
       if (selected) {
-        cells.get(selected).classList.remove('selected');
+        const prev = cells.find(c => c.label.textContent === selected);
+        if (prev) prev.cell.classList.remove('selected');
         selected = null;
+      }
+    },
+    updateNames(newNames) {
+      for (let i = 0; i < cells.length; i++) {
+        const oldName = cells[i].label.textContent;
+        const newName = newNames[i];
+        cells[i].label.textContent = newName;
+        if (selected === oldName) selected = newName;
       }
     },
   };

@@ -40,9 +40,22 @@ export function importJSON(str) {
     if (typeof r.category !== 'string') throw new Error('唔啱格式');
     if (typeof r.createdAt !== 'number') throw new Error('唔啱格式');
     if (!Array.isArray(r.noteStrokes)) throw new Error('唔啱格式');
-    if (typeof r.lunarDate !== 'string') throw new Error('唔啱格式');
   }
   writeAll(data);
+}
+
+export function renameCategories(renames) {
+  if (!renames.length) return;
+  const map = new Map(renames.map(r => [r.from, r.to]));
+  const records = loadRecords();
+  let changed = false;
+  for (const r of records) {
+    if (map.has(r.category)) {
+      r.category = map.get(r.category);
+      changed = true;
+    }
+  }
+  if (changed) writeAll(records);
 }
 
 function writeAll(records) {

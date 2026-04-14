@@ -1,14 +1,17 @@
-import { toLunarString } from './lunar.js';
-import { saveRecord, loadRecords, deleteRecord, clearAll, exportJSON, importJSON } from './storage.js';
-import { renderCategoryGrid, CATEGORIES } from './categories.js';
+import { saveRecord, loadRecords, deleteRecord, clearAll, exportJSON, importJSON, renameCategories } from './storage.js';
+import { renderCategoryGrid, getCategories } from './categories.js';
 import { renderAbacus } from './abacus.js';
 import { renderNotePad, drawStrokes } from './handwriting.js';
+import { loadSettings, saveSettings, formatDate, DEFAULT_CATEGORIES } from './settings.js';
 
 const tabs = document.querySelectorAll('#tabs .tab');
 const screens = {
   entry: document.getElementById('screen-entry'),
   ledger: document.getElementById('screen-ledger'),
 };
+
+let currentCats = null;
+let currentDateEl = null;
 
 function showScreen(name) {
   for (const key of Object.keys(screens)) {
@@ -44,9 +47,20 @@ function buildEntryScreen() {
       </svg>
     </div>
     <div class="lunar-date"></div>
+    <button type="button" class="gear-btn" aria-label="設定">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9.4 4a7.5 7.5 0 0 0-.1-1.3l2.1-1.6-2-3.4-2.5 1a7.5 7.5 0 0 0-2.3-1.3l-.4-2.6h-4l-.4 2.6a7.5 7.5 0 0 0-2.3 1.3l-2.5-1-2 3.4 2.1 1.6A7.5 7.5 0 0 0 2.6 12c0 .4 0 .9.1 1.3L.6 14.9l2 3.4 2.5-1a7.5 7.5 0 0 0 2.3 1.3l.4 2.6h4l.4-2.6a7.5 7.5 0 0 0 2.3-1.3l2.5 1 2-3.4-2.1-1.6c.1-.4.1-.9.1-1.3z"
+              fill="none" stroke="var(--ink)" stroke-width="1.6"
+              stroke-linejoin="round" />
+      </svg>
+    </button>
   `;
   root.appendChild(header);
-  header.querySelector('.lunar-date').textContent = toLunarString(new Date());
+
+  currentDateEl = header.querySelector('.lunar-date');
+  refreshDate();
+
+  header.querySelector('.gear-btn').addEventListener('click', openSettings);
 
   const amountCard = document.createElement('button');
   amountCard.type = 'button';
@@ -105,6 +119,7 @@ function buildEntryScreen() {
   sheet.addEventListener('click', e => e.stopPropagation());
 
   const cats = renderCategoryGrid(root, () => {});
+  currentCats = cats;
 
   const pad = renderNotePad(root);
 
@@ -136,14 +151,13 @@ function buildEntryScreen() {
     const category = cats.value;
     if (amount === 0 || !category) {
       saveBtn.classList.remove('shake');
-      void saveBtn.offsetWidth; // restart animation
+      void saveBtn.offsetWidth;
       saveBtn.classList.add('shake');
       return;
     }
     const record = {
       id: String(Date.now()),
       createdAt: Date.now(),
-      lunarDate: toLunarString(new Date()),
       amount,
       category,
       noteStrokes: pad.getStrokes(),
@@ -154,11 +168,9 @@ function buildEntryScreen() {
       alert('寫唔入簿\n' + e.message);
       return;
     }
-    // stamp animation
     chop.classList.remove('stamp');
     void chop.offsetWidth;
     chop.classList.add('stamp');
-    // reset form
     abacus.reset();
     cats.clear();
     pad.clear();
@@ -166,6 +178,135 @@ function buildEntryScreen() {
   });
 }
 
+function refreshDate() {
+  if (!currentDateEl) return;
+  const mode = loadSettings().dateFormat;
+  currentDateEl.textContent = formatDate(new Date(), mode);
+}
+
+// -------- Settings modal --------
+
+function openSettings() {
+  const settings = loadSettings();
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal settings-modal';
+  modal.innerHTML = `
+    <header class="modal-header">
+      <h2>設定</h2>
+      <button type="button" class="modal-close" aria-label="關閉">✕</button>
+    </header>
+    <div class="modal-body">
+      <section class="settings-section">
+        <h3>日期</h3>
+        <div class="segmented" role="radiogroup">
+          <button type="button" class="seg-btn" data-mode="lunar">農曆</button>
+          <button type="button" class="seg-btn" data-mode="solar">西曆</button>
+        </div>
+      </section>
+      <section class="settings-section">
+        <h3>分類</h3>
+        <div class="cat-edit-grid"></div>
+      </section>
+    </div>
+    <footer class="modal-footer">
+      <button type="button" class="lf-btn" data-act="reset">還原</button>
+      <button type="button" class="lf-btn primary" data-act="save">儲存</button>
+    </footer>
+  `;
+
+  backdrop.appendChild(modal);
+  document.body.appendChild(backdrop);
+  requestAnimationFrame(() => backdrop.classList.add('open'));
+
+  const segBtns = modal.querySelectorAll('.seg-btn');
+  let currentMode = settings.dateFormat;
+  function paintSeg() {
+    for (const b of segBtns) {
+      b.classList.toggle('active', b.dataset.mode === currentMode);
+    }
+  }
+  paintSeg();
+  for (const b of segBtns) {
+    b.addEventListener('click', () => {
+      currentMode = b.dataset.mode;
+      paintSeg();
+    });
+  }
+
+  const catGrid = modal.querySelector('.cat-edit-grid');
+  const catInputs = [];
+  for (let i = 0; i < settings.categories.length; i++) {
+    const row = document.createElement('label');
+    row.className = 'cat-edit-row';
+    const hint = document.createElement('span');
+    hint.className = 'cat-edit-hint';
+    hint.textContent = DEFAULT_CATEGORIES[i];
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = 6;
+    input.className = 'cat-edit-input';
+    input.value = settings.categories[i];
+    row.appendChild(hint);
+    row.appendChild(input);
+    catGrid.appendChild(row);
+    catInputs.push(input);
+  }
+
+  function close() {
+    backdrop.classList.remove('open');
+    setTimeout(() => backdrop.remove(), 220);
+  }
+
+  modal.querySelector('.modal-close').addEventListener('click', close);
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop) close();
+  });
+
+  modal.querySelector('[data-act="reset"]').addEventListener('click', () => {
+    for (let i = 0; i < catInputs.length; i++) {
+      catInputs[i].value = DEFAULT_CATEGORIES[i];
+    }
+    currentMode = 'lunar';
+    paintSeg();
+  });
+
+  modal.querySelector('[data-act="save"]').addEventListener('click', () => {
+    const oldCats = settings.categories.slice();
+    const newCats = catInputs.map((inp, i) => {
+      const v = inp.value.trim();
+      return v || oldCats[i];
+    });
+    const seen = new Set();
+    for (let i = 0; i < newCats.length; i++) {
+      let base = newCats[i];
+      let name = base;
+      let n = 2;
+      while (seen.has(name)) name = base + n++;
+      newCats[i] = name;
+      seen.add(name);
+    }
+    const renames = [];
+    for (let i = 0; i < oldCats.length; i++) {
+      if (oldCats[i] !== newCats[i]) {
+        renames.push({ from: oldCats[i], to: newCats[i] });
+      }
+    }
+    saveSettings({ categories: newCats, dateFormat: currentMode });
+    if (renames.length) {
+      renameCategories(renames);
+      const map = new Map(renames.map(r => [r.from, r.to]));
+      if (activeFilter && map.has(activeFilter)) activeFilter = map.get(activeFilter);
+    }
+    if (currentCats) currentCats.updateNames(newCats);
+    refreshDate();
+    if (screens.ledger.dataset.active === 'true') renderLedger();
+    close();
+  });
+}
 
 // -------- Ledger screen --------
 
@@ -175,9 +316,9 @@ function renderLedger() {
   const root = screens.ledger;
   root.innerHTML = '';
 
+  const settings = loadSettings();
   const all = loadRecords().sort((a, b) => b.createdAt - a.createdAt);
 
-  // Month total for the current calendar month
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
   const monthTotal = all
@@ -189,10 +330,9 @@ function renderLedger() {
   totalBox.innerHTML = `<span>本月總計</span><strong>$${(monthTotal / 100).toFixed(2)}</strong>`;
   root.appendChild(totalBox);
 
-  // Filter chips
   const chips = document.createElement('div');
   chips.className = 'filter-chips';
-  for (const name of CATEGORIES) {
+  for (const name of settings.categories) {
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.className = 'filter-chip';
@@ -206,7 +346,6 @@ function renderLedger() {
   }
   root.appendChild(chips);
 
-  // List
   const list = document.createElement('div');
   list.className = 'ledger-list';
   root.appendChild(list);
@@ -220,7 +359,7 @@ function renderLedger() {
     list.appendChild(empty);
   } else {
     for (const r of visible) {
-      list.appendChild(buildLedgerRow(r));
+      list.appendChild(buildLedgerRow(r, settings.dateFormat));
     }
   }
 
@@ -264,15 +403,17 @@ function renderLedger() {
   });
 }
 
-function buildLedgerRow(record) {
+function buildLedgerRow(record, mode) {
   const row = document.createElement('div');
   row.className = 'ledger-row';
+
+  const dateStr = formatDate(new Date(record.createdAt), mode);
 
   const summary = document.createElement('button');
   summary.type = 'button';
   summary.className = 'ledger-summary';
   summary.innerHTML = `
-    <div class="lr-date">${record.lunarDate}</div>
+    <div class="lr-date">${dateStr}</div>
     <div class="lr-amount">$${(record.amount / 100).toFixed(2)}</div>
     <div class="lr-cat">${record.category}</div>
     <canvas class="lr-thumb" width="160" height="60"></canvas>
