@@ -18,7 +18,24 @@ html, body {
   font-family: "Noto Serif TC", "Ma Shan Zheng", serif;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(ellipse at top, rgba(255,255,255,0.4), transparent 60%),
+    radial-gradient(ellipse at bottom right, rgba(120, 80, 20, 0.08), transparent 60%);
 }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  filter: url(#paper-noise);
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+#app { position: relative; z-index: 1; }
+#tabs { position: fixed; z-index: 2; }
 
 #app {
   max-width: 480px;
