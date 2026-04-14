@@ -244,14 +244,14 @@ body::before {
 
 .notepad-label {
   position: absolute;
-  top: 6px;
-  left: 8px;
+  top: 10px;
+  left: 12px;
   font-family: inherit;
   font-size: 14px;
   font-weight: 900;
   color: var(--ink);
   background: var(--paper);
-  padding: 1px 6px;
+  padding: 3px 10px;
   border: 1px solid var(--ink);
   border-radius: 2px;
   letter-spacing: 2px;
