@@ -1,0 +1,56 @@
+:root {
+  --paper: #f3e9d2;
+  --ink: #1a1a1a;
+  --seal: #b8002e;
+  --rule: #c9a878;
+  --cash: #2d5a3d;
+  --wood: #7a4a2b;
+  --bead: #3a2418;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Noto Serif TC", "Ma Shan Zheng", serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 16px calc(72px + env(safe-area-inset-bottom)) 16px;
+  min-height: 100vh;
+}
+
+.screen { display: none; }
+.screen[data-active="true"] { display: block; }
+
+#tabs {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom)) 16px;
+  background: var(--paper);
+  border-top: 2px solid var(--rule);
+}
+
+#tabs .tab {
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  padding: 8px 20px;
+  min-height: 44px;
+  opacity: 0.5;
+}
+
+#tabs .tab.active { opacity: 1; }
