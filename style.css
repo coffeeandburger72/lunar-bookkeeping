@@ -139,3 +139,79 @@ html, body {
   min-height: 32px;
   padding: 0 8px;
 }
+
+.entry-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.seal {
+  width: 64px;
+  height: 64px;
+  transform: rotate(-3deg);
+  flex-shrink: 0;
+}
+
+.seal svg {
+  width: 100%;
+  height: 100%;
+}
+
+.lunar-date {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.save-btn {
+  display: block;
+  width: 100%;
+  margin: 24px 0 8px;
+  padding: 18px 0;
+  font-family: inherit;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--paper);
+  background: var(--seal);
+  border: none;
+  border-radius: 6px;
+  letter-spacing: 6px;
+  min-height: 64px;
+}
+
+.save-btn.shake {
+  animation: shake 260ms ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.chop {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  font-size: 180px;
+  font-weight: 900;
+  color: var(--seal);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.chop.stamp {
+  animation: chop-fade 600ms ease-out;
+}
+
+@keyframes chop-fade {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) rotate(-8deg) scale(1.4); }
+  30%  { opacity: 0.5; transform: translate(-50%, -50%) rotate(-8deg) scale(1.0); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) rotate(-8deg) scale(1.0); }
+}
