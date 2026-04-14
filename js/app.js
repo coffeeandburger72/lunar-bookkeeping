@@ -1,5 +1,5 @@
 import { toLunarString } from './lunar.js';
-import { saveRecord, loadRecords, deleteRecord } from './storage.js';
+import { saveRecord, loadRecords, deleteRecord, clearAll, exportJSON, importJSON } from './storage.js';
 import { renderCategoryGrid, CATEGORIES } from './categories.js';
 import { renderAbacus } from './abacus.js';
 import { renderNotePad, drawStrokes } from './handwriting.js';
@@ -163,6 +163,45 @@ function renderLedger() {
       list.appendChild(buildLedgerRow(r));
     }
   }
+
+  const footer = document.createElement('div');
+  footer.className = 'ledger-footer';
+  footer.innerHTML = `
+    <button type="button" class="lf-btn" data-act="export">匯出</button>
+    <label class="lf-btn" data-act="import">
+      匯入<input type="file" accept="application/json" hidden />
+    </label>
+    <button type="button" class="lf-btn danger" data-act="clear">清簿</button>
+  `;
+  root.appendChild(footer);
+
+  footer.querySelector('[data-act="export"]').addEventListener('click', () => {
+    const blob = new Blob([exportJSON()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `數簿-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  footer.querySelector('[data-act="import"] input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+      importJSON(text);
+      renderLedger();
+    } catch (err) {
+      alert('唔啱格式: ' + err.message);
+    }
+  });
+
+  footer.querySelector('[data-act="clear"]').addEventListener('click', () => {
+    if (!confirm('清簿?\n所有記錄將會刪除')) return;
+    clearAll();
+    renderLedger();
+  });
 }
 
 function buildLedgerRow(record) {
