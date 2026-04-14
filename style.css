@@ -234,6 +234,7 @@ body.sheet-open { overflow: hidden; }
   margin: 24px 0;
   border: 2px solid var(--rule);
   border-radius: 4px;
+  cursor: pointer;
   background:
     repeating-linear-gradient(
       to bottom,
@@ -259,36 +260,26 @@ body.sheet-open { overflow: hidden; }
   z-index: 1;
 }
 
-.notepad-canvas {
+.notepad-preview {
   display: block;
   width: 100%;
-  height: 180px;
-  touch-action: none;
-}
-
-.notepad[data-locked="true"] .notepad-canvas {
+  height: 120px;
   touch-action: auto;
-  opacity: 0.55;
+  pointer-events: none;
 }
 
-.notepad-lock {
+.notepad-hint {
   position: absolute;
-  top: 6px;
-  right: 52px;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: inherit;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--seal);
-  background: transparent;
-  border: none;
-  min-height: 32px;
-  padding: 0 8px;
-  z-index: 2;
-}
-
-.notepad[data-locked="true"] .notepad-lock {
+  font-size: 16px;
+  letter-spacing: 4px;
   color: var(--ink);
-  opacity: 0.55;
+  opacity: 0.45;
+  pointer-events: none;
 }
 
 .notepad-clear {
@@ -304,6 +295,78 @@ body.sheet-open { overflow: hidden; }
   min-height: 32px;
   padding: 0 8px;
   z-index: 2;
+}
+
+.draw-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--paper);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  border-top: 2px solid var(--rule);
+  box-shadow: 0 -8px 24px rgba(26, 16, 6, 0.25);
+  padding: 10px 14px calc(18px + env(safe-area-inset-bottom));
+  transform: translateY(110%);
+  transition: transform 320ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+.draw-sheet[data-open="true"] {
+  transform: translateY(0);
+}
+
+.draw-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 4px 10px;
+}
+
+.draw-sheet-title {
+  flex: 1;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--ink);
+}
+
+.draw-sheet-clear,
+.draw-sheet-done {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 4px;
+  background: transparent;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+}
+
+.draw-sheet-done {
+  background: var(--seal);
+  border-color: var(--seal);
+  color: var(--paper);
+}
+
+.draw-sheet-canvas {
+  display: block;
+  width: 100%;
+  height: min(70vh, 460px);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0, transparent 38px,
+      var(--rule) 38px, var(--rule) 39px
+    ),
+    var(--paper);
+  border: 2px solid var(--rule);
+  border-radius: 4px;
+  touch-action: none;
 }
 
 .entry-header {

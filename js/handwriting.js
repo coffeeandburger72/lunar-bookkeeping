@@ -1,22 +1,22 @@
 export function renderNotePad(container) {
   const wrap = document.createElement('div');
   wrap.className = 'notepad';
-  wrap.dataset.locked = 'true';
 
   const tag = document.createElement('span');
   tag.className = 'notepad-label';
   tag.textContent = '備註';
   wrap.appendChild(tag);
 
-  const canvas = document.createElement('canvas');
-  canvas.className = 'notepad-canvas';
-  wrap.appendChild(canvas);
+  const preview = document.createElement('canvas');
+  preview.className = 'notepad-preview';
+  preview.width = 480;
+  preview.height = 200;
+  wrap.appendChild(preview);
 
-  const lockBtn = document.createElement('button');
-  lockBtn.type = 'button';
-  lockBtn.textContent = '寫';
-  lockBtn.className = 'notepad-lock';
-  wrap.appendChild(lockBtn);
+  const hint = document.createElement('span');
+  hint.className = 'notepad-hint';
+  hint.textContent = '點此寫字';
+  wrap.appendChild(hint);
 
   const clearBtn = document.createElement('button');
   clearBtn.type = 'button';
@@ -26,22 +26,88 @@ export function renderNotePad(container) {
 
   container.appendChild(wrap);
 
-  lockBtn.addEventListener('click', () => {
-    const locked = wrap.dataset.locked !== 'false';
-    wrap.dataset.locked = locked ? 'false' : 'true';
-    lockBtn.textContent = locked ? '鎖' : '寫';
+  let strokes = [];
+
+  function renderPreview() {
+    drawStrokes(preview, strokes);
+    hint.style.display = strokes.length ? 'none' : '';
+  }
+
+  function openSheet() {
+    openDrawSheet(strokes, (newStrokes) => {
+      strokes = newStrokes;
+      renderPreview();
+    });
+  }
+
+  wrap.addEventListener('click', (e) => {
+    if (e.target === clearBtn) return;
+    openSheet();
   });
 
-  // Use a fixed internal resolution for crisp strokes; CSS sizes it responsively.
-  const W = 480;
-  const H = 200;
+  clearBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    strokes = [];
+    renderPreview();
+  });
+
+  return {
+    getStrokes: () => strokes.map(s => s.slice()),
+    clear: () => { strokes = []; renderPreview(); },
+  };
+}
+
+function openDrawSheet(initialStrokes, onDone) {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'sheet-backdrop';
+
+  const sheet = document.createElement('div');
+  sheet.className = 'draw-sheet';
+
+  const grip = document.createElement('div');
+  grip.className = 'sheet-grip';
+  sheet.appendChild(grip);
+
+  const header = document.createElement('div');
+  header.className = 'draw-sheet-header';
+  const title = document.createElement('span');
+  title.className = 'draw-sheet-title';
+  title.textContent = '備註';
+  const clearBtn = document.createElement('button');
+  clearBtn.type = 'button';
+  clearBtn.className = 'draw-sheet-clear';
+  clearBtn.textContent = '清';
+  const doneBtn = document.createElement('button');
+  doneBtn.type = 'button';
+  doneBtn.className = 'draw-sheet-done';
+  doneBtn.textContent = '完成';
+  header.appendChild(title);
+  header.appendChild(clearBtn);
+  header.appendChild(doneBtn);
+  sheet.appendChild(header);
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'draw-sheet-canvas';
+  const W = 600;
+  const H = 600;
   canvas.width = W;
   canvas.height = H;
-  const ctx = canvas.getContext('2d');
+  sheet.appendChild(canvas);
 
-  const strokes = [];
+  document.body.appendChild(backdrop);
+  document.body.appendChild(sheet);
+  document.body.classList.add('sheet-open');
+  requestAnimationFrame(() => {
+    backdrop.dataset.open = 'true';
+    sheet.dataset.open = 'true';
+  });
+
+  const ctx = canvas.getContext('2d');
+  const strokes = initialStrokes.map(s => s.slice());
   let current = null;
   let startT = 0;
+
+  function clamp01(v) { return Math.max(0, Math.min(1, v)); }
 
   function pointFromEvent(e) {
     const rect = canvas.getBoundingClientRect();
@@ -51,11 +117,9 @@ export function renderNotePad(container) {
     return [clamp01(x), clamp01(y), t];
   }
 
-  function clamp01(v) { return Math.max(0, Math.min(1, v)); }
-
   function drawPoint(p, prev) {
     ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = Math.max(2, W / 150);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
@@ -65,8 +129,9 @@ export function renderNotePad(container) {
     ctx.stroke();
   }
 
+  drawStrokes(canvas, strokes);
+
   canvas.addEventListener('pointerdown', e => {
-    if (wrap.dataset.locked !== 'false') return;
     canvas.setPointerCapture(e.pointerId);
     startT = Date.now();
     current = [pointFromEvent(e)];
@@ -76,7 +141,6 @@ export function renderNotePad(container) {
 
   canvas.addEventListener('pointermove', e => {
     if (!current) return;
-    if (wrap.dataset.locked !== 'false') return;
     const p = pointFromEvent(e);
     const prev = current[current.length - 1];
     current.push(p);
@@ -91,13 +155,19 @@ export function renderNotePad(container) {
     ctx.clearRect(0, 0, W, H);
   });
 
-  return {
-    getStrokes: () => strokes.map(s => s.slice()),
-    clear: () => {
-      strokes.length = 0;
-      ctx.clearRect(0, 0, W, H);
-    },
-  };
+  function close(save) {
+    backdrop.dataset.open = 'false';
+    sheet.dataset.open = 'false';
+    setTimeout(() => {
+      document.body.classList.remove('sheet-open');
+      backdrop.remove();
+      sheet.remove();
+      if (save) onDone(strokes);
+    }, 280);
+  }
+
+  doneBtn.addEventListener('click', () => close(true));
+  backdrop.addEventListener('click', () => close(true));
 }
 
 export function drawStrokes(canvas, strokes) {
