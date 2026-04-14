@@ -20,7 +20,7 @@ export function renderNotePad(container) {
   const preview = document.createElement('canvas');
   preview.className = 'notepad-preview';
   preview.width = 600;
-  preview.height = 220;
+  preview.height = 250;
   openBtn.appendChild(preview);
 
   const clearBtn = document.createElement('button');
@@ -96,7 +96,7 @@ function openDrawSheet(initialStrokes, onDone) {
   const canvas = document.createElement('canvas');
   canvas.className = 'draw-sheet-canvas';
   const W = 600;
-  const H = 600;
+  const H = 250;
   canvas.width = W;
   canvas.height = H;
   sheet.appendChild(canvas);
