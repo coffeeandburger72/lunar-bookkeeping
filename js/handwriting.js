@@ -2,6 +2,11 @@ export function renderNotePad(container) {
   const wrap = document.createElement('div');
   wrap.className = 'notepad';
 
+  const tag = document.createElement('span');
+  tag.className = 'notepad-label';
+  tag.textContent = '備註';
+  wrap.appendChild(tag);
+
   const canvas = document.createElement('canvas');
   canvas.className = 'notepad-canvas';
   wrap.appendChild(canvas);

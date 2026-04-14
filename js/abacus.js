@@ -1,4 +1,4 @@
-const COLUMNS = 13;
+const COLUMNS = 11;
 const CENTS_COLUMNS = 2;
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -16,13 +16,13 @@ const HEAVEN_DELTA = 9;
 const EARTH_DELTA = -12;
 
 const COL_LABELS = {
-  2: '千萬',
-  5: '萬',
-  8: '百',
-  9: '十',
-  10: '元',
-  11: '角',
-  12: '分',
+  0: '千萬',
+  3: '萬',
+  6: '百',
+  7: '十',
+  8: '元',
+  9: '角',
+  10: '分',
 };
 
 export function renderAbacus(container, onChange) {
@@ -74,8 +74,8 @@ export function renderAbacus(container, onChange) {
   bar.setAttribute('fill', 'url(#bar-grad)');
   svg.appendChild(bar);
 
-  // Decimal separator between 元 (col 10) and 角 (col 11) — red tick
-  const decimalX = FRAME_PAD + 11 * COL_W;
+  // Decimal separator between 元 (col 8) and 角 (col 9) — red tick
+  const decimalX = FRAME_PAD + 9 * COL_W;
   const tickTop = document.createElementNS(NS, 'circle');
   tickTop.setAttribute('cx', decimalX);
   tickTop.setAttribute('cy', BAR_Y - 8);
@@ -145,7 +145,7 @@ export function renderAbacus(container, onChange) {
       label.setAttribute('font-size', '11');
       label.setAttribute('font-weight', '700');
       label.setAttribute('font-family', 'Noto Serif TC, serif');
-      label.setAttribute('fill', c >= 11 ? 'var(--seal)' : 'var(--ink)');
+      label.setAttribute('fill', c >= 9 ? 'var(--seal)' : 'var(--ink)');
       label.setAttribute('opacity', '0.7');
       label.setAttribute('pointer-events', 'none');
       label.textContent = COL_LABELS[c];

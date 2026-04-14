@@ -40,7 +40,7 @@ body::before {
 #app {
   max-width: 480px;
   margin: 0 auto;
-  padding: 16px 16px calc(72px + env(safe-area-inset-bottom)) 16px;
+  padding: 16px 16px calc(160px + env(safe-area-inset-bottom)) 16px;
   min-height: 100vh;
 }
 
@@ -161,14 +161,72 @@ body::before {
   content: "▼ ";
 }
 
-.abacus-drawer {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 280ms ease;
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 16, 6, 0.45);
+  z-index: 20;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+.sheet-backdrop[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
 }
 
-.abacus-drawer[data-open="true"] {
-  max-height: 360px;
+.abacus-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--paper);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  border-top: 2px solid var(--rule);
+  box-shadow: 0 -8px 24px rgba(26, 16, 6, 0.25);
+  padding: 10px 14px calc(18px + env(safe-area-inset-bottom));
+  transform: translateY(110%);
+  transition: transform 320ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+.abacus-sheet[data-open="true"] {
+  transform: translateY(0);
+}
+
+.sheet-grip {
+  width: 42px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--rule);
+  margin: 2px auto 10px;
+  opacity: 0.7;
+}
+
+.sheet-body .abacus {
+  margin: 0;
+}
+
+.save-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(68px + env(safe-area-inset-bottom));
+  z-index: 3;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  pointer-events: none;
+  transform: translateY(140%);
+  opacity: 0;
+  transition: transform 280ms cubic-bezier(0.33, 1, 0.68, 1), opacity 220ms ease;
+}
+.save-bar[data-visible="true"] {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .notepad {
@@ -182,6 +240,23 @@ body::before {
       transparent 0, transparent 28px,
       var(--rule) 28px, var(--rule) 29px
     );
+}
+
+.notepad-label {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--ink);
+  background: var(--paper);
+  padding: 1px 6px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  letter-spacing: 2px;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .notepad-canvas {
@@ -233,17 +308,18 @@ body::before {
 .save-btn {
   display: block;
   width: 100%;
-  margin: 24px 0 8px;
-  padding: 18px 0;
+  margin: 0;
+  padding: 16px 0;
   font-family: inherit;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 900;
   color: var(--paper);
   background: var(--seal);
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   letter-spacing: 6px;
-  min-height: 64px;
+  min-height: 60px;
+  box-shadow: 0 6px 18px rgba(184, 0, 46, 0.35);
 }
 
 .save-btn.shake {

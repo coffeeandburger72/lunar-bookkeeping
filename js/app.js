@@ -17,6 +17,9 @@ function showScreen(name) {
   for (const tab of tabs) {
     tab.classList.toggle('active', tab.dataset.screen === name);
   }
+  if (entrySaveBar) {
+    entrySaveBar.dataset.visible = name === 'entry' ? 'true' : 'false';
+  }
   if (name === 'ledger') renderLedger();
 }
 
@@ -68,27 +71,52 @@ function buildEntryScreen() {
     readout.style.fontSize = size + 'px';
   }
 
-  const abacusDrawer = document.createElement('div');
-  abacusDrawer.className = 'abacus-drawer';
-  abacusDrawer.dataset.open = 'false';
-  root.appendChild(abacusDrawer);
-  const abacus = renderAbacus(abacusDrawer, setReadout);
+  const backdrop = document.createElement('div');
+  backdrop.className = 'sheet-backdrop';
+  backdrop.dataset.open = 'false';
+  document.body.appendChild(backdrop);
+
+  const sheet = document.createElement('div');
+  sheet.className = 'abacus-sheet';
+  sheet.dataset.open = 'false';
+  sheet.innerHTML = `<div class="sheet-grip"></div>`;
+  const sheetBody = document.createElement('div');
+  sheetBody.className = 'sheet-body';
+  sheet.appendChild(sheetBody);
+  document.body.appendChild(sheet);
+  const abacus = renderAbacus(sheetBody, setReadout);
+
+  function openSheet() {
+    sheet.dataset.open = 'true';
+    backdrop.dataset.open = 'true';
+    amountCard.setAttribute('aria-expanded', 'true');
+  }
+  function closeSheet() {
+    sheet.dataset.open = 'false';
+    backdrop.dataset.open = 'false';
+    amountCard.setAttribute('aria-expanded', 'false');
+  }
 
   amountCard.addEventListener('click', () => {
-    const open = abacusDrawer.dataset.open === 'true';
-    abacusDrawer.dataset.open = open ? 'false' : 'true';
-    amountCard.setAttribute('aria-expanded', open ? 'false' : 'true');
+    if (sheet.dataset.open === 'true') closeSheet();
+    else openSheet();
   });
+  backdrop.addEventListener('click', closeSheet);
+  sheet.addEventListener('click', e => e.stopPropagation());
 
   const cats = renderCategoryGrid(root, () => {});
 
   const pad = renderNotePad(root);
 
+  const saveBar = document.createElement('div');
+  saveBar.className = 'save-bar';
   const saveBtn = document.createElement('button');
   saveBtn.type = 'button';
   saveBtn.className = 'save-btn';
   saveBtn.textContent = '入賬';
-  root.appendChild(saveBtn);
+  saveBar.appendChild(saveBtn);
+  document.body.appendChild(saveBar);
+  entrySaveBar = saveBar;
 
   const chop = document.createElement('div');
   chop.className = 'chop';
@@ -134,10 +162,11 @@ function buildEntryScreen() {
     abacus.reset();
     cats.clear();
     pad.clear();
-    abacusDrawer.dataset.open = 'false';
-    amountCard.setAttribute('aria-expanded', 'false');
+    closeSheet();
   });
 }
+
+let entrySaveBar = null;
 
 // -------- Ledger screen --------
 
