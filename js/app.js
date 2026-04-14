@@ -118,13 +118,10 @@ function buildEntryScreen() {
   chop.className = 'chop';
   chop.innerHTML = `
     <svg viewBox="0 0 100 100" aria-hidden="true">
-      <rect x="6" y="6" width="88" height="88" rx="3" fill="var(--seal)"
-            stroke="#f6d06a" stroke-width="3" />
-      <rect x="12" y="12" width="76" height="76" rx="1" fill="none"
-            stroke="#f6d06a" stroke-width="1" stroke-opacity="0.6" />
+      <rect x="4" y="4" width="92" height="92" rx="3" fill="var(--seal)" />
       <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
-            font-family="'ZCOOL XiaoWei', 'Noto Serif TC', serif"
-            font-size="64" font-weight="900" fill="#f6d06a">入</text>
+            font-family="'華康新篆體','DFPHSinZhuanW7','DFPHSin Zhuan W7','HanWangZhuanShu','ZCOOL XiaoWei','Noto Serif TC',serif"
+            font-size="68" font-weight="900" fill="#f6d06a">入</text>
     </svg>
   `;
   chop.addEventListener('animationend', () => chop.classList.remove('stamp'));

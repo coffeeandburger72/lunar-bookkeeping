@@ -302,15 +302,13 @@ body.sheet-open { overflow: hidden; }
   height: 82px;
   padding: 0;
   z-index: 5;
-  font-family: 'ZCOOL XiaoWei', 'Noto Serif TC', serif;
+  font-family: '華康新篆體', 'DFPHSinZhuanW7', 'DFPHSin Zhuan W7',
+               'HanWangZhuanShu', 'ZCOOL XiaoWei', 'Noto Serif TC', serif;
   color: #f6d06a;
   background: var(--seal);
-  border: 3px solid #f6d06a;
+  border: none;
   border-radius: 4px;
-  box-shadow:
-    0 0 0 2px var(--seal),
-    0 8px 20px rgba(26, 16, 6, 0.45),
-    inset 0 0 0 1px rgba(246, 208, 106, 0.35);
+  box-shadow: 0 8px 20px rgba(26, 16, 6, 0.45);
   cursor: pointer;
   opacity: 1;
   transition: opacity 220ms ease, transform 220ms ease;
