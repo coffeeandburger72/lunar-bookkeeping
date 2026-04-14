@@ -70,7 +70,15 @@ function buildEntryScreen() {
 
   const chop = document.createElement('div');
   chop.className = 'chop';
-  chop.textContent = '入';
+  chop.innerHTML = `
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <rect x="4" y="4" width="92" height="92" rx="4" fill="var(--seal)" />
+      <text x="50" y="72" text-anchor="middle"
+            font-family="Noto Serif TC, serif"
+            font-size="72" font-weight="900" fill="var(--paper)">入</text>
+    </svg>
+  `;
+  chop.addEventListener('animationend', () => chop.classList.remove('stamp'));
   root.appendChild(chop);
 
   saveBtn.addEventListener('click', () => {

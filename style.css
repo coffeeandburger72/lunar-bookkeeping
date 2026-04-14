@@ -212,25 +212,29 @@ body::before {
 
 .chop {
   position: fixed;
-  top: 30%;
+  top: 40%;
   left: 50%;
+  width: 180px;
+  height: 180px;
   transform: translate(-50%, -50%) rotate(-8deg);
-  font-size: 180px;
-  font-weight: 900;
-  color: var(--seal);
-  opacity: 0;
   pointer-events: none;
   z-index: 10;
+  visibility: hidden;
+  opacity: 0;
 }
 
+.chop svg { width: 100%; height: 100%; display: block; }
+
 .chop.stamp {
-  animation: chop-fade 600ms ease-out;
+  visibility: visible;
+  animation: chop-fade 700ms ease-out;
 }
 
 @keyframes chop-fade {
-  0%   { opacity: 0;   transform: translate(-50%, -50%) rotate(-8deg) scale(1.4); }
-  30%  { opacity: 0.5; transform: translate(-50%, -50%) rotate(-8deg) scale(1.0); }
-  100% { opacity: 0;   transform: translate(-50%, -50%) rotate(-8deg) scale(1.0); }
+  0%   { opacity: 0;    transform: translate(-50%, -50%) rotate(-8deg) scale(1.6); }
+  15%  { opacity: 0.95; transform: translate(-50%, -50%) rotate(-8deg) scale(1.0); }
+  70%  { opacity: 0.9;  transform: translate(-50%, -50%) rotate(-8deg) scale(1.0); }
+  100% { opacity: 0;    transform: translate(-50%, -50%) rotate(-8deg) scale(1.05); }
 }
 
 .month-total {
