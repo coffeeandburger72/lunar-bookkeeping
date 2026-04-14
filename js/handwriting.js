@@ -7,16 +7,21 @@ export function renderNotePad(container) {
   tag.textContent = '備註';
   wrap.appendChild(tag);
 
-  const preview = document.createElement('canvas');
-  preview.className = 'notepad-preview';
-  preview.width = 480;
-  preview.height = 200;
-  wrap.appendChild(preview);
+  const openBtn = document.createElement('button');
+  openBtn.type = 'button';
+  openBtn.className = 'notepad-open';
+  wrap.appendChild(openBtn);
 
   const hint = document.createElement('span');
   hint.className = 'notepad-hint';
-  hint.textContent = '點此寫字';
-  wrap.appendChild(hint);
+  hint.textContent = '✎  點此寫備註';
+  openBtn.appendChild(hint);
+
+  const preview = document.createElement('canvas');
+  preview.className = 'notepad-preview';
+  preview.width = 600;
+  preview.height = 220;
+  openBtn.appendChild(preview);
 
   const clearBtn = document.createElement('button');
   clearBtn.type = 'button';
@@ -29,20 +34,20 @@ export function renderNotePad(container) {
   let strokes = [];
 
   function renderPreview() {
-    drawStrokes(preview, strokes);
-    hint.style.display = strokes.length ? 'none' : '';
+    const has = strokes.length > 0;
+    wrap.dataset.has = has ? 'true' : 'false';
+    if (has) drawStrokes(preview, strokes);
+    else {
+      const ctx = preview.getContext('2d');
+      ctx.clearRect(0, 0, preview.width, preview.height);
+    }
   }
 
-  function openSheet() {
+  openBtn.addEventListener('click', () => {
     openDrawSheet(strokes, (newStrokes) => {
       strokes = newStrokes;
       renderPreview();
     });
-  }
-
-  wrap.addEventListener('click', (e) => {
-    if (e.target === clearBtn) return;
-    openSheet();
   });
 
   clearBtn.addEventListener('click', (e) => {
@@ -50,6 +55,8 @@ export function renderNotePad(container) {
     strokes = [];
     renderPreview();
   });
+
+  renderPreview();
 
   return {
     getStrokes: () => strokes.map(s => s.slice()),
